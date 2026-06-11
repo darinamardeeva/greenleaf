@@ -739,8 +739,8 @@ async function loadProductsFromSheet(){
     for(let i=1;i<lines.length;i++){
       const cols = lines[i].split('\t').map(c=>c.trim().replace(/^"|"$/g,''));
       const art = cols[iArt]||'';
-      if(!art || art==='#N/A' || name==='#N/A') continue;
       const name = cols[iName]||'';
+      if(!art || art==='#N/A' || name==='#N/A') continue;
       const price = parseFloat((cols[iPrice]||'0').replace(/[^\d.,]/g,'').replace(',','.'))||0;
       const pv = parseFloat((cols[iPV]||'0').replace(',','.'))||0;
       const stock = parseInt(cols[iStock]||'0')||0;
