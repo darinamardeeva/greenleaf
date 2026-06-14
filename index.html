@@ -1129,6 +1129,7 @@ async function sendVKNotification(order, itemsText, deliveryText){
 📞 ${order.phone}
 ${order.delivery==='pickup'?'🏪 Самовывоз (Карла Маркса, 194)':'🚚 Доставка: '+order.address}
 💳 Оплата: ${order.payment||'—'}
+${order.ru?'🔑 RU: '+order.ru:''}
 ${order.comment?'💬 '+order.comment:''}
 
 📦 Товары:
