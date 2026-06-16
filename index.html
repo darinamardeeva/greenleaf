@@ -808,11 +808,11 @@ function promptAdmin(){
 // ── CARD HTML ─────────────────────────────────────────────────
 function productCardHTML(p){
   const inCart=cart[p.id]>0;
-  
+  const imgSrc=p.photo||p.img||'';
   return `<div class="pcard${p.inStock?'':' out-stock'}" onclick="openProductModal(${p.id})">
     <div class="pcard-img" style='background:#f5f9f2'>
       ${p.inStock?'<span class="pcard-badge badge-instock">В наличии</span>':'<span class="pcard-badge badge-out">Нет в наличии</span>'}
-      ${p.photo?`<img src="${p.photo}" alt="${p.name}" style="max-width:100%;max-height:160px;width:auto;height:auto;object-fit:contain;display:block;margin:auto;padding:8px;background:#f5f9f2;" loading="lazy" onerror="this.parentElement.style.background='#f5f9f2';this.remove()">`:
+      ${imgSrc?`<img src="${imgSrc}" alt="${p.name}" style="max-width:100%;max-height:160px;width:auto;height:auto;object-fit:contain;display:block;margin:auto;padding:8px;background:#f5f9f2;" loading="lazy" onerror="this.parentElement.style.background='#f5f9f2';this.remove()">`:
       `<span style="margin-top:8px">${p.emoji}</span>`}
     </div>
     <div class="pcard-body">
@@ -957,7 +957,7 @@ function openProductModal(id){
   const p=products.find(x=>x.id===id);
   
   const pmEl=document.getElementById('pm-img');
-  if(p.photo){pmEl.style='height:260px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f5f9f2;';pmEl.innerHTML=`<img src="${p.photo}" alt="${p.name}" style="max-width:90%;max-height:240px;width:auto;height:auto;object-fit:contain;display:block;margin:auto;" onerror="this.parentElement.style='';this.parentElement.innerHTML='<span style=\'font-size:90px\'>${p.emoji}</span>'">`;}
+  const mImgSrc=p.photo||p.img||'';if(mImgSrc){pmEl.style='height:260px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f5f9f2;';pmEl.innerHTML=`<img src="${mImgSrc}" alt="${p.name}" style="max-width:90%;max-height:240px;width:auto;height:auto;object-fit:contain;display:block;margin:auto;" onerror="this.parentElement.style='';this.parentElement.innerHTML='<span style=\'font-size:90px\'>${p.emoji}</span>'">`;}
   else{pmEl.style='';pmEl.innerHTML=`<span style="font-size:90px">${p.emoji}</span>`;}
   document.getElementById('pm-img').style.background='#f5f9f2';
   document.getElementById('pm-brand').textContent=getBrand(p.name);
