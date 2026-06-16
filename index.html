@@ -335,6 +335,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="filter-item" id="f-aroma" onclick="setCatFilter('aroma',this)">
           <span>🌸 Ароматизаторы</span><span class="filter-count" id="fc-aroma">0</span>
         </div>
+        <div class="filter-item" id="f-deo" onclick="setCatFilter('deo',this)">
+          <span>🌬️ Дезодоранты</span><span class="filter-count" id="fc-deo">0</span>
+        </div>
+        <div class="filter-item" id="f-hygiene" onclick="setCatFilter('hygiene',this)">
+          <span>🩷 Гигиена</span><span class="filter-count" id="fc-hygiene">0</span>
+        </div>
+        <div class="filter-item" id="f-access" onclick="setCatFilter('access',this)">
+          <span>🌿 Здоровье и аксессуары</span><span class="filter-count" id="fc-access">0</span>
+        </div>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-title">Наличие</div>
@@ -727,6 +736,7 @@ async function loadProductsFromSheet(){
     const header = lines[0].split('\t').map(h=>h.trim().replace(/"/g,''));
     // Колонки: № | Артикул | Наименование товара | Цена | PV | Остаток на складе | Описание | Фото (ссылка)
     const iArt = header.findIndex(h=>h.includes('Артикул'));
+    const iCat = header.findIndex(h=>h.includes('Категория'));
     const iName = header.findIndex(h=>h.includes('Наименование'));
     const iPrice = header.findIndex(h=>h.includes('Цена'));
     const iPV = header.findIndex(h=>h.toUpperCase().includes('PV'));
@@ -746,7 +756,19 @@ async function loadProductsFromSheet(){
       const stock = parseInt(cols[iStock]||'0')||0;
       const desc = (iDesc>=0 && cols[iDesc]) ? cols[iDesc] : (DESC_MAP[art]||'');
       const photo = (iPhoto>=0 && cols[iPhoto]) ? cols[iPhoto] : '';
-      const cat = CAT_MAP[art]||'beauty';
+      // Категория: сначала из таблицы, потом CAT_MAP, потом body
+      const rawCat = (iCat>=0 && cols[iCat]) ? cols[iCat].trim() : '';
+      const CAT_RU = {
+        'Уход за волосами':'hair','Уход за телом':'body','Уход за лицом':'face',
+        'Уход за кожей':'skin','Крем для рук':'skin','Крем для лица':'face',
+        'Уход за зубами':'teeth','Уборка для дома':'clean','Уход за домом':'clean',
+        'Стирка':'laundry','Ароматизатор':'aroma','Ароматизотор':'aroma',
+        'Дезодорант':'deo','Личная гигиена':'hygiene','Женская гигиена':'hygiene',
+        'Здоровье':'access','Аксессуары':'access',
+      };
+      const validCats = ['hair','body','face','skin','teeth','clean','laundry','aroma','deo','hygiene','access'];
+      const catFromSheet = CAT_RU[rawCat] || (validCats.includes(rawCat) ? rawCat : '');
+      let cat = catFromSheet || CAT_MAP[art] || 'body';
       const emoji = EMOJI_MAP[art]||'🌿';
       result.push({id:i,art,name,price,pv,stock,cat,emoji,desc,photo,inStock:stock>0});
     }
