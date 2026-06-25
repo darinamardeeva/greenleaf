@@ -1,0 +1,77 @@
+<!--
+  Cookie-баннер для greenleaf-mgn.ru
+  Вставить ОДИН РАЗ перед закрывающим тегом </body> в index.html.
+  Показывается, пока пользователь не сделает выбор. Выбор запоминается.
+-->
+
+<div id="gl-cookie" class="gl-cookie" style="display:none">
+  <div class="gl-cookie__text">
+    Мы используем cookie для работы сайта и аналитики. Подробнее —
+    в <a href="/policy.html" target="_blank" rel="noopener">Политике обработки данных</a>.
+  </div>
+  <div class="gl-cookie__btns">
+    <button class="gl-cookie__btn gl-cookie__btn--no" onclick="glCookie(false)">Отклонить</button>
+    <button class="gl-cookie__btn gl-cookie__btn--yes" onclick="glCookie(true)">Принять</button>
+  </div>
+</div>
+
+<style>
+.gl-cookie {
+  position: fixed;
+  left: 12px; right: 12px; bottom: 12px;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #e3e7e0;
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.12);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #333;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.gl-cookie a { color: #4a8c3f; }
+.gl-cookie__btns { display: flex; gap: 8px; }
+.gl-cookie__btn {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gl-cookie__btn--yes { background: #4a8c3f; color: #fff; }
+.gl-cookie__btn--no  { background: #f0f0ee; color: #555; }
+@media (min-width: 600px) {
+  .gl-cookie { flex-direction: row; align-items: center; }
+  .gl-cookie__btns { flex: 0 0 auto; }
+  .gl-cookie__btn { flex: 0 0 auto; }
+}
+</style>
+
+<script>
+(function () {
+  // показать баннер, если выбор ещё не сделан
+  try {
+    if (!localStorage.getItem('gl_cookie_choice')) {
+      document.getElementById('gl-cookie').style.display = 'flex';
+    }
+  } catch (e) {
+    document.getElementById('gl-cookie').style.display = 'flex';
+  }
+})();
+
+function glCookie(accepted) {
+  try {
+    localStorage.setItem('gl_cookie_choice', accepted ? 'accepted' : 'declined');
+  } catch (e) {}
+  document.getElementById('gl-cookie').style.display = 'none';
+  // Если будешь подключать Яндекс.Метрику — запускай её ТОЛЬКО при accepted === true.
+  // if (accepted) { /* инициализация необязательных cookie/аналитики */ }
+}
+</script>
