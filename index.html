@@ -284,8 +284,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- HOME -->
 <div class="page active" id="page-home">
   <div class="hero" id="site-hero">
-    <p class="hero-eye" id="hero-city" style="font-size:14px;letter-spacing:0.15em;opacity:0.8;margin-bottom:1.5rem">МАГНИТОГОРСК · КАРЛА МАРКСА, 194</p>
-    <h1 id="hero-title">Жить чисто.<br><span style="color:#7dc99a">Дышать свободно.</span></h1>
+    <p class="hero-eye" id="hero-city" style="font-size:15px;letter-spacing:0.15em;opacity:0.8;margin-bottom:1.5rem">МАГНИТОГОРСК · КАРЛА МАРКСА, 194</p>
+    <h1 id="hero-title">Жить чисто!<br><span style="color:#7dc99a">Дышать свободно!</span></h1>
     <p class="hero-sub" id="hero-sub">Натуральная косметика, эко-средства для дома и товары для здоровья от проверенных брендов.</p>
     <div class="hero-btns">
       <button class="btn-primary" onclick="showPage('catalog')">Перейти в каталог</button>
@@ -596,7 +596,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div class="form-group"><label class="form-label">Комментарий</label><textarea class="form-textarea" id="o-comment" placeholder="Время доставки, пожелания..."></textarea></div>
       <div class="order-summary" id="order-summary-block"></div>
+
+      <div class="gl-consent">
+        <label class="gl-consent__row">
+          <input type="checkbox" id="consent-order">
+          <span>Я ознакомлен(а) с <a href="/policy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a> и даю согласие на обработку моих данных (имя, телефон, RU-идентификатор, адрес доставки) для оформления и выполнения заказа.</span>
+        </label>
+        <label class="gl-consent__row">
+          <input type="checkbox" id="consent-marketing">
+          <span>Хочу получать сообщения об акциях, новинках и бонусах. <em>(необязательно)</em></span>
+        </label>
+      </div>
+
       <button class="submit-order-btn" onclick="submitOrder()">✅ Подтвердить заказ</button>
+      <p style="font-size:12px;color:var(--gl-muted);text-align:center;margin-top:8px">Оформляя заказ, вы принимаете условия <a href="/offer.html" target="_blank" rel="noopener" style="color:var(--gl-accent)">Публичной оферты</a>.</p>
+
+      <style>
+        .gl-consent{margin:16px 0;display:flex;flex-direction:column;gap:12px}
+        .gl-consent__row{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.45;color:var(--gl-text);cursor:pointer}
+        .gl-consent__row input[type="checkbox"]{width:22px;height:22px;min-width:22px;margin-top:1px;accent-color:var(--gl-accent);cursor:pointer}
+        .gl-consent__row a{color:var(--gl-accent);text-decoration:underline}
+        .gl-consent__row em{color:var(--gl-muted);font-style:normal}
+      </style>
     </div>
     <div id="order-success-wrap" style="display:none" class="success-screen">
       <div class="success-icon">🎉</div>
@@ -710,7 +731,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div style="border-top:1px solid var(--gl-border);padding-top:1.25rem">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gl-accent);margin-bottom:6px">↩️ Возврат</div>
-        <p style="font-size:14px;line-height:1.7;color:var(--gl-text)">Возврат не предусмотрен согласно Постановлению Правительства РФ № 55 от 19.01.1998.</p>
+        <p style="font-size:14px;line-height:1.7;color:var(--gl-text)">Порядок возврата и обмена — в <a href="/offer.html" style="color:var(--gl-accent)">Публичной оферте</a>. Парфюмерно-косметические товары и бытовая химия надлежащего качества обмену и возврату не подлежат. Товар ненадлежащего качества возвращается по закону за счёт продавца.</p>
       </div>
     </div>
   </div>
@@ -1101,6 +1122,7 @@ async function submitOrder(){
   const address=document.getElementById('o-address').value.trim();
   if(!name){showToast('Введите имя');return;}
   if(!phone){showToast('Введите телефон');return;}
+  if(!document.getElementById('consent-order').checked){showToast('Подтвердите согласие на обработку данных');return;}
   if(selectedDelivery==='delivery'&&!address){showToast('Введите адрес');return;}
   const keys=Object.keys(cart).filter(k=>cart[k]>0);
   let total=0,totalPV=0;
@@ -1323,6 +1345,27 @@ loadProductsFromSheet().then(data=>{
   renderHome();
   renderCatalog();
 });
+</script>
+
+<div id="gl-cookie" class="gl-cookie" style="display:none">
+  <div class="gl-cookie__text">Мы используем cookie для работы сайта и аналитики. Подробнее — в <a href="/policy.html" target="_blank" rel="noopener">Политике обработки данных</a>.</div>
+  <div class="gl-cookie__btns">
+    <button class="gl-cookie__btn gl-cookie__btn--no" onclick="glCookie(false)">Отклонить</button>
+    <button class="gl-cookie__btn gl-cookie__btn--yes" onclick="glCookie(true)">Принять</button>
+  </div>
+</div>
+<style>
+.gl-cookie{position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#fff;border:1px solid #e3e7e0;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.12);padding:14px 16px;display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.45;color:#333;max-width:520px;margin:0 auto}
+.gl-cookie a{color:#4a8c3f}
+.gl-cookie__btns{display:flex;gap:8px}
+.gl-cookie__btn{flex:1;padding:11px 14px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.gl-cookie__btn--yes{background:#4a8c3f;color:#fff}
+.gl-cookie__btn--no{background:#f0f0ee;color:#555}
+@media(min-width:600px){.gl-cookie{flex-direction:row;align-items:center}.gl-cookie__btns{flex:0 0 auto}.gl-cookie__btn{flex:0 0 auto}}
+</style>
+<script>
+(function(){try{if(!localStorage.getItem('gl_cookie_choice')){document.getElementById('gl-cookie').style.display='flex';}}catch(e){document.getElementById('gl-cookie').style.display='flex';}})();
+function glCookie(accepted){try{localStorage.setItem('gl_cookie_choice',accepted?'accepted':'declined');}catch(e){}document.getElementById('gl-cookie').style.display='none';}
 </script>
 </body>
 </html>
