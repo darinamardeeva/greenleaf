@@ -23,6 +23,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-btn{background:none;border:0.5px solid rgba(255,255,255,0.2);color:#fff;padding:7px 14px;border-radius:6px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s;white-space:nowrap}
 .nav-btn:hover{background:rgba(255,255,255,0.1)}
 .cart-badge{background:#4a8c5c;color:#fff;border-radius:10px;min-width:18px;height:18px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:600;padding:0 4px}
+.nav-burger{display:none;background:none;border:0.5px solid rgba(255,255,255,0.2);color:#fff;width:38px;height:38px;border-radius:6px;font-size:17px;cursor:pointer;align-items:center;justify-content:center}
+.mobile-nav-drop{display:none;flex-direction:column;background:var(--gl-dark);position:sticky;top:64px;z-index:99;padding:6px;gap:2px;border-top:1px solid rgba(255,255,255,0.08)}
+.mobile-nav-drop.open{display:flex}
+.mobile-nav-link{background:none;border:none;color:rgba(255,255,255,0.85);text-align:left;padding:12px 14px;font-size:15px;border-radius:8px;cursor:pointer}
+.mobile-nav-link:active,.mobile-nav-link.active{background:rgba(255,255,255,0.1);color:#fff}
 .page{display:none}.page.active{display:block}
 .hero{background:var(--gl-dark);color:#fff;padding:5rem 2rem 4rem;text-align:center;position:relative}
 .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:var(--gl-cream);clip-path:ellipse(60% 100% at 50% 100%)}
@@ -69,7 +74,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pcard-name{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pcard-meta{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
 .pcard-art{font-size:10px;color:var(--gl-muted)}
-.pcard-pv{font-size:11px;background:#fff8e1;color:#b07800;padding:2px 7px;border-radius:10px;font-weight:600}
+.pcard-pv{font-size:11px;background:var(--gl-light);color:var(--gl-accent);padding:2px 7px;border-radius:10px;font-weight:600}
 .pcard-footer{display:flex;align-items:center;justify-content:space-between}
 .pcard-price{font-size:16px;font-weight:600;color:var(--gl-dark)}
 .add-to-cart{background:var(--gl-dark);color:#fff;border:none;width:32px;height:32px;border-radius:7px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;line-height:1}
@@ -81,14 +86,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;align-items:center;justify-content:center;padding:1rem}
 .overlay.open{display:flex}
 .modal{background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:92vh;overflow-y:auto;position:relative}
-.modal-close{position:absolute;top:14px;right:14px;background:var(--gl-light);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:20px;line-height:1;color:var(--gl-text);z-index:10;display:flex;align-items:center;justify-content:center}
+#product-modal{overflow:hidden;display:flex;flex-direction:column}
+.modal-topbar{flex-shrink:0;display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--gl-border)}
+.modal-back-btn{background:var(--gl-light);border:none;padding:9px 16px 9px 12px;border-radius:9px;font-size:14px;font-weight:600;color:var(--gl-text);cursor:pointer;display:flex;align-items:center;gap:4px}
+.modal-back-btn:active{background:var(--gl-border)}
+.modal-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-footer{flex-shrink:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--gl-border);background:#fff}
+.modal-footer .modal-add-btn{margin:0}
 .modal-img{height:260px;display:flex;align-items:center;justify-content:center;font-size:88px;background:var(--gl-light);overflow:hidden}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--gl-light);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:20px;line-height:1;color:var(--gl-text);z-index:10;display:flex;align-items:center;justify-content:center}
 .modal-body{padding:1.75rem}
 .modal-brand{font-size:11px;color:var(--gl-accent);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:5px}
 .modal-name{font-size:21px;font-weight:600;margin-bottom:8px;line-height:1.3}
 .modal-tags-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .modal-art-tag{font-size:11px;color:var(--gl-muted);background:var(--gl-light);padding:3px 9px;border-radius:8px}
-.modal-pv-tag{font-size:12px;background:#fff8e1;color:#b07800;padding:4px 11px;border-radius:8px;font-weight:600}
+.modal-pv-tag{font-size:12px;background:var(--gl-light);color:var(--gl-accent);padding:4px 11px;border-radius:8px;font-weight:600}
 .modal-stock-tag{font-size:12px;padding:4px 11px;border-radius:8px;font-weight:500}
 .tag-instock{background:#dcf5e4;color:#1a6b3a}
 .tag-outstock{background:#f5e0e0;color:#8b2c2c}
@@ -126,7 +138,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ci-emoji{width:50px;height:50px;background:var(--gl-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
 .ci-info{flex:1;min-width:0}
 .ci-name{font-size:13px;font-weight:500;line-height:1.35;margin-bottom:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.ci-pv{font-size:11px;color:#b07800;margin-bottom:4px}
+.ci-pv{font-size:11px;color:var(--gl-accent);margin-bottom:4px}
 .ci-price{font-size:13px;color:var(--gl-accent);font-weight:600}
 .ci-qty{display:flex;align-items:center;gap:8px;margin-top:6px}
 .qty-btn{background:var(--gl-light);border:none;width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--gl-text);font-weight:600}
@@ -135,7 +147,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ci-del:hover{color:#c0392b}
 .cart-footer{padding:1.25rem 1.5rem;border-top:1px solid var(--gl-border);flex-shrink:0}
 .cart-total-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
-.cart-pv-row{display:flex;justify-content:space-between;font-size:13px;color:#b07800;margin-bottom:12px;font-weight:500}
+.cart-pv-row{display:flex;justify-content:space-between;font-size:13px;color:var(--gl-accent);margin-bottom:12px;font-weight:500}
 .cart-total-row strong{font-weight:700;font-size:16px}
 .checkout-btn{background:var(--gl-dark);color:#fff;border:none;width:100%;padding:14px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s}
 .checkout-btn:hover{background:var(--gl-accent)}
@@ -161,7 +173,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .order-summary{background:var(--gl-light);border-radius:10px;padding:1rem;margin-bottom:1.5rem}
 .order-sum-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
 .order-sum-row:last-child{font-weight:700;font-size:15px;margin-bottom:0;padding-top:8px;border-top:1px solid rgba(26,58,42,0.12)}
-.order-sum-pv{color:#b07800;font-size:13px;font-weight:500;margin-top:6px;padding-top:6px;border-top:1px solid rgba(26,58,42,0.08);display:flex;justify-content:space-between}
+.order-sum-pv{color:var(--gl-accent);font-size:13px;font-weight:500;margin-top:6px;padding-top:6px;border-top:1px solid rgba(26,58,42,0.08);display:flex;justify-content:space-between}
 .submit-order-btn{background:var(--gl-dark);color:#fff;border:none;width:100%;padding:14px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s}
 .submit-order-btn:hover{background:var(--gl-accent)}
 .success-screen{text-align:center;padding:1rem 0}
@@ -216,7 +228,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .order-items-mini{font-size:12px;color:var(--gl-text);background:var(--gl-light);border-radius:6px;padding:8px 10px;line-height:1.8;margin-bottom:10px}
 .order-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .order-total{font-size:14px;font-weight:600;color:var(--gl-dark)}
-.order-pv-total{font-size:12px;color:#b07800;font-weight:500}
+.order-pv-total{font-size:12px;color:var(--gl-accent);font-weight:500}
 .order-complete-btn{background:var(--gl-accent);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500}
 .order-complete-btn:disabled{background:#ccc;cursor:not-allowed}
 .empty-orders{text-align:center;padding:4rem;color:var(--gl-muted);font-size:14px}
@@ -258,10 +270,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 @media(max-width:768px){
   .catalog-layout{flex-direction:column;padding:1rem}
   .sidebar{width:100%;position:static}
-  .products-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr))}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
   .nav-links{display:none}
+  .nav-burger{display:flex}
+  .nav{padding:0 1rem}
   .form-row,.delivery-options,.admin-form-row{grid-template-columns:1fr}
   .cart-drawer{width:100%;max-width:100%}
+  .overlay{padding:0}
+  .modal{max-width:100%;width:100%;height:100%;max-height:100%;border-radius:0}
+  .modal-body{padding:1.25rem}
+  .modal-img{height:220px}
+}
+@media(max-width:380px){
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -282,8 +303,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="nav-right">
     <button class="nav-btn" onclick="openCart()">🛒 Корзина <span class="cart-badge" id="cart-badge" style="display:none">0</span></button>
     <button class="nav-btn" onclick="promptAdmin()" title="Панель управления">⚙️</button>
+    <button class="nav-burger" id="nav-burger" onclick="toggleMobileNav()" aria-label="Меню">☰</button>
   </div>
 </nav>
+<div class="mobile-nav-drop" id="mobile-nav-drop">
+  <button class="mobile-nav-link" onclick="showPage('home');closeMobileNav()">Главная</button>
+  <button class="mobile-nav-link" onclick="showPage('catalog');closeMobileNav()">Каталог</button>
+  <button class="mobile-nav-link" onclick="showPage('about');closeMobileNav()">О нас</button>
+</div>
 
 <!-- HOME -->
 <div class="page active" id="page-home">
@@ -530,7 +557,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- PRODUCT MODAL -->
 <div class="overlay" id="product-overlay" onclick="closeProductModal(event)">
   <div class="modal" id="product-modal">
-    <button class="modal-close" onclick="closeProductModal(null,true)">×</button>
+    <div class="modal-topbar" onclick="event.stopPropagation()">
+      <button class="modal-back-btn" onclick="closeProductModal(null,true)">← Назад</button>
+    </div>
+    <div class="modal-scroll">
     <div class="modal-img" id="pm-img"></div>
     <div class="modal-body">
       <div class="modal-brand" id="pm-brand"></div>
@@ -548,10 +578,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="ai-desc-header"><span class="ai-desc-icon">📋</span><span class="ai-desc-title">Состав</span></div>
         <ul class="pm-list pm-list-comp" id="pm-comp-list"></ul>
       </div>
-      <div class="ai-desc-block" id="pm-usage-block" style="display:none">
-        <div class="ai-desc-header"><span class="ai-desc-icon">💧</span><span class="ai-desc-title">Применение</span></div>
-        <ul class="pm-list pm-list-usage" id="pm-usage-list"></ul>
-      </div>
+    </div>
+    </div>
+    <div class="modal-footer">
       <button class="modal-add-btn" id="pm-add">🛒 Добавить в корзину</button>
     </div>
   </div>
@@ -856,6 +885,13 @@ function showPage(page){
   if(page==='admin'){renderAdminProducts();renderAdminOrders();}
 }
 
+function toggleMobileNav(){
+  document.getElementById('mobile-nav-drop').classList.toggle('open');
+}
+function closeMobileNav(){
+  document.getElementById('mobile-nav-drop').classList.remove('open');
+}
+
 function promptAdmin(){
   if(adminUnlocked){showPage('admin');return;}
   const pw=prompt('Введите пароль администратора:');
@@ -1000,17 +1036,6 @@ function renderAIDesc(data){
   }else{
     compBlock.style.display='none';
     compList.innerHTML='';
-  }
-
-  const usageItems=splitListField(data.usage);
-  const usageBlock=document.getElementById('pm-usage-block');
-  const usageList=document.getElementById('pm-usage-list');
-  if(usageItems.length){
-    usageBlock.style.display='';
-    usageList.innerHTML=usageItems.map(i=>`<li>${i}</li>`).join('');
-  }else{
-    usageBlock.style.display='none';
-    usageList.innerHTML='';
   }
 }
 
