@@ -1220,7 +1220,7 @@ async function submitOrder(){
   }
 
   // Send VK notification
-  sendVKNotification(order, itemsText, deliveryText);
+  await sendVKNotification(order, itemsText, deliveryText);
 
   cart={};updateCartBadge();renderCartItems();
   document.getElementById('order-form-wrap').style.display='none';
@@ -1248,7 +1248,8 @@ ${itemsText}
     await fetch(TG_WEBHOOK, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: msg})
+      body: JSON.stringify({message: msg}),
+      keepalive: true
     });
   } catch(e){
     console.error('Telegram error:', e);
