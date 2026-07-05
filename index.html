@@ -372,9 +372,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="filter-item" id="f-aroma" onclick="setCatFilter('aroma',this)">
           <span>Ароматы для дома</span>
         </div>
-        <div class="filter-item" id="f-deo" onclick="setCatFilter('deo',this)">
-          <span>Дезодоранты</span>
-        </div>
         <div class="filter-item" id="f-hygiene" onclick="setCatFilter('hygiene',this)">
           <span>Женская гигиена</span>
         </div>
@@ -942,11 +939,12 @@ function productCardHTML(p){
 
 // ── HOME ──────────────────────────────────────────────────────
 function updateCatCounts(){
-  ['hair','body','hands','face','teeth','makeup','kids','laundry','clean','aroma','deo','hygiene','access','health'].forEach(c=>{
+  ['hair','body','hands','face','teeth','makeup','kids','laundry','clean','aroma','hygiene','access','health'].forEach(c=>{
     const el=document.getElementById('fc-'+c);
     if(el) el.textContent=products.filter(p=>p.cat===c).length;
   });
-  document.getElementById('fc-all').textContent=products.length;
+  const allEl=document.getElementById('fc-all');
+  if(allEl) allEl.textContent=products.length;
 }
 function renderHome(){
   const inStockProds=products.filter(p=>p.inStock).slice(0,8);
@@ -1408,6 +1406,9 @@ loadProductsFromSheet().then(data=>{
   }
   renderHome();
   renderCatalog();
+}).catch(e=>{
+  console.error('Init error:', e);
+  try{ renderHome(); renderCatalog(); }catch(e2){ console.error('Fallback render error:', e2); }
 });
 </script>
 
