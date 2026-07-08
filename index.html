@@ -69,6 +69,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pcard-badge{position:absolute;top:8px;left:8px;font-size:10px;padding:3px 8px;border-radius:5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
 .badge-instock{background:var(--gl-dark);color:#fff}
 .badge-out{background:#bbb;color:#fff}
+.badge-low{background:#e07b00;color:#fff}
 .pcard-body{padding:13px}
 .pcard-brand{font-size:10px;color:var(--gl-accent);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:3px}
 .pcard-name{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -142,7 +143,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ci-price{font-size:13px;color:var(--gl-accent);font-weight:600}
 .ci-qty{display:flex;align-items:center;gap:8px;margin-top:6px}
 .qty-btn{background:var(--gl-light);border:none;width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--gl-text);font-weight:600}
+.qty-btn:disabled{opacity:.4;cursor:not-allowed}
 .qty-num{font-size:13px;font-weight:600;min-width:16px;text-align:center}
+.pcard-qty{display:flex;align-items:center;gap:6px;background:var(--gl-light);border-radius:7px;padding:3px 4px}
+.pcard-qty .qty-num{min-width:14px}
+.modal-qty-stepper{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--gl-light);border-radius:10px;padding:10px;width:100%}
+.modal-qty-btn{width:32px;height:32px;border-radius:8px;font-size:16px}
+.modal-qty-num{font-size:15px;font-weight:600;min-width:100px}
 .ci-del{background:none;border:none;cursor:pointer;color:var(--gl-muted);font-size:18px;padding:4px;line-height:1;flex-shrink:0;align-self:flex-start;margin-top:2px}
 .ci-del:hover{color:#c0392b}
 .cart-footer{padding:1.25rem 1.5rem;border-top:1px solid var(--gl-border);flex-shrink:0}
@@ -586,7 +593,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
     </div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer" id="pm-footer">
       <button class="modal-add-btn" id="pm-add">🛒 Добавить в корзину</button>
     </div>
   </div>
@@ -914,11 +921,16 @@ function promptAdmin(){
 
 // ── CARD HTML ─────────────────────────────────────────────────
 function productCardHTML(p){
-  const inCart=cart[p.id]>0;
+  const inCart=cart[p.id]||0;
+  const maxedOut=p.inStock&&inCart>=p.stock;
   const imgSrc=p.photo||p.img||'';
+  let stockBadge;
+  if(!p.inStock) stockBadge='<span class="pcard-badge badge-out">Нет в наличии</span>';
+  else if(p.stock<=5) stockBadge=`<span class="pcard-badge badge-low">Осталось: ${p.stock} шт.</span>`;
+  else stockBadge='<span class="pcard-badge badge-instock">В наличии</span>';
   return `<div class="pcard${p.inStock?'':' out-stock'}" onclick="openProductModal(${p.id})">
     <div class="pcard-img" style='background:#f5f9f2'>
-      ${p.inStock?'<span class="pcard-badge badge-instock">В наличии</span>':'<span class="pcard-badge badge-out">Нет в наличии</span>'}
+      ${stockBadge}
       ${imgSrc?`<img src="${imgSrc}" alt="${p.name}" style="max-width:100%;max-height:160px;width:auto;height:auto;object-fit:contain;display:block;margin:auto;padding:8px;background:#f5f9f2;" loading="lazy" onerror="this.parentElement.style.background='#f5f9f2';this.remove()">`:
       `<span style="margin-top:8px">${p.emoji}</span>`}
     </div>
@@ -931,7 +943,11 @@ function productCardHTML(p){
       </div>
       <div class="pcard-footer">
         <span class="pcard-price">${fmtPrice(p.price)}</span>
-        <button class="add-to-cart${inCart?' in-cart':''}" ${!p.inStock?'disabled':''} onclick="event.stopPropagation();addToCart(${p.id})">${inCart?'✓':'+'}</button>
+        ${inCart>0?`<div class="pcard-qty" onclick="event.stopPropagation()">
+          <button class="qty-btn" onclick="changeQty(${p.id},-1)">−</button>
+          <span class="qty-num">${inCart}</span>
+          <button class="qty-btn" ${maxedOut?'disabled title="Достигнут остаток на складе"':''} onclick="changeQty(${p.id},1)">+</button>
+        </div>`:`<button class="add-to-cart" ${!p.inStock?'disabled':''} onclick="event.stopPropagation();addToCart(${p.id})">+</button>`}
       </div>
     </div>
   </div>`;
@@ -1058,9 +1074,29 @@ function renderAIDesc(data){
 }
 
 // ── PRODUCT MODAL ─────────────────────────────────────────────
+let currentModalId=null;
+function renderModalFooter(id){
+  const p=products.find(x=>x.id===id);
+  const footer=document.getElementById('pm-footer');
+  if(!p||!p.inStock){
+    footer.innerHTML='<button class="modal-add-btn" disabled>Нет в наличии</button>';
+    return;
+  }
+  const qty=cart[id]||0;
+  if(qty>0){
+    const maxed=qty>=p.stock;
+    footer.innerHTML=`<div class="modal-qty-stepper">
+      <button class="qty-btn modal-qty-btn" onclick="changeQty(${id},-1)">−</button>
+      <span class="modal-qty-num">${qty} шт. в корзине</span>
+      <button class="qty-btn modal-qty-btn" ${maxed?'disabled title="Достигнут остаток на складе"':''} onclick="changeQty(${id},1)">+</button>
+    </div>`;
+  }else{
+    footer.innerHTML=`<button class="modal-add-btn" id="pm-add" onclick="addToCart(${id})">🛒 Добавить в корзину</button>`;
+  }
+}
 function openProductModal(id){
   const p=products.find(x=>x.id===id);
-  
+  currentModalId=id;
   const pmEl=document.getElementById('pm-img');
   const mImgSrc=p.photo||p.img||'';if(mImgSrc){pmEl.style='height:260px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f5f9f2;';pmEl.innerHTML=`<img src="${mImgSrc}" alt="${p.name}" style="max-width:90%;max-height:240px;width:auto;height:auto;object-fit:contain;display:block;margin:auto;" onerror="this.parentElement.style='';this.parentElement.innerHTML='<span style=\'font-size:90px\'>${p.emoji}</span>'">`;}
   else{pmEl.style='';pmEl.innerHTML=`<span style="font-size:90px">${p.emoji}</span>`;}
@@ -1073,30 +1109,39 @@ function openProductModal(id){
     <span class="modal-pv-tag">⭐ ${fmtPV(p.pv)} PV</span>
     <span class="modal-stock-tag ${p.inStock?'tag-instock':'tag-outstock'}">${p.inStock?'В наличии: '+p.stock+' шт.':'Нет в наличии'}</span>`;
   document.getElementById('pm-price').textContent=fmtPrice(p.price);
-  const btn=document.getElementById('pm-add');
-  btn.disabled=!p.inStock;
-  btn.textContent=cart[p.id]?'✓ В корзине':'🛒 Добавить в корзину';
-  btn.onclick=()=>{addToCart(id);btn.textContent='✓ В корзине';};
+  renderModalFooter(id);
   document.getElementById('product-overlay').classList.add('open');
   loadAIDesc(p);
 }
 function closeProductModal(e,force){
-  if(force||e.target===document.getElementById('product-overlay'))
+  if(force||e.target===document.getElementById('product-overlay')){
     document.getElementById('product-overlay').classList.remove('open');
+    currentModalId=null;
+  }
 }
 
 // ── CART ──────────────────────────────────────────────────────
 function addToCart(id){
   const p=products.find(x=>x.id===id);if(!p||!p.inStock)return;
-  cart[id]=(cart[id]||0)+1;
+  const cur=cart[id]||0;
+  if(cur>=p.stock){showToast('Больше нельзя добавить — в наличии только '+p.stock+' шт.');return;}
+  cart[id]=cur+1;
   updateCartBadge();renderCartItems();
   showToast(p.name.slice(0,40)+'... — добавлен');
   renderHome();
   if(document.getElementById('catalog-grid').innerHTML) renderCatalog();
+  if(currentModalId===id) renderModalFooter(id);
 }
 function changeQty(id,d){
-  cart[id]=(cart[id]||0)+d;if(cart[id]<=0) delete cart[id];
+  id=Number(id);
+  const p=products.find(x=>x.id===id);
+  const cur=cart[id]||0;
+  if(d>0&&p&&cur>=p.stock){showToast('Больше нельзя добавить — в наличии только '+p.stock+' шт.');return;}
+  cart[id]=cur+d;if(cart[id]<=0) delete cart[id];
   updateCartBadge();renderCartItems();
+  if(document.getElementById('catalog-grid').innerHTML) renderCatalog();
+  renderHome();
+  if(currentModalId===id) renderModalFooter(id);
 }
 function removeFromCart(id){delete cart[id];updateCartBadge();renderCartItems();}
 function updateCartBadge(){
@@ -1126,7 +1171,7 @@ function renderCartItems(){
         <div class="ci-qty">
           <button class="qty-btn" onclick="changeQty(${id},-1)">−</button>
           <span class="qty-num">${cart[id]}</span>
-          <button class="qty-btn" onclick="changeQty(${id},1)">+</button>
+          <button class="qty-btn" ${cart[id]>=p.stock?'disabled title="Достигнут остаток на складе"':''} onclick="changeQty(${id},1)">+</button>
         </div>
       </div>
       <button class="ci-del" onclick="removeFromCart(${id})">×</button>
