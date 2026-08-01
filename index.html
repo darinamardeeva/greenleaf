@@ -1261,6 +1261,7 @@ async function submitOrder(){
     delivery: deliveryText,
     payment: order.payment||'—',
     address: address||'—',
+    ru: order.ru||'—',
     comment: order.comment||'—',
     items: itemsText,
     total: fmtPrice(total),
