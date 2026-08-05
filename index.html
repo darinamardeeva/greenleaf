@@ -1253,19 +1253,32 @@ async function submitOrder(){
   // Телеграм — основной канал уведомлений, шлём его первым и не ждём email
   sendVKNotification(order, itemsText, deliveryText);
 
-  // Email — best effort, не блокирует ни интерфейс, ни телеграм-уведомление
-  emailjs.send('service_6ccb078','template_votz2xr',{
-    order_num: orderNum,
-    client_name: name,
-    client_phone: phone,
-    delivery: deliveryText,
-    payment: order.payment||'—',
-    address: address||'—',
-    ru: order.ru||'—',
-    comment: order.comment||'—',
-    items: itemsText,
-    total: fmtPrice(total),
-    pv: fmtPV(totalPV)+' PV',
+  // Email — best effort, не блокирует ни интерфейс, ни телеграм-уведомление.
+  // Идём напрямую в REST API EmailJS (а не через их SDK), потому что SDK не
+  // прокидывает keepalive — без него запрос может оборваться, если клиент
+  // закрыл вкладку/свернул приложение сразу после экрана "успех".
+  fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    keepalive: true,
+    body: JSON.stringify({
+      service_id: 'service_6ccb078',
+      template_id: 'template_votz2xr',
+      user_id: 'aBIaVrVDAnCEGmM84',
+      template_params: {
+        order_num: orderNum,
+        client_name: name,
+        client_phone: phone,
+        delivery: deliveryText,
+        payment: order.payment||'—',
+        address: address||'—',
+        ru: order.ru||'—',
+        comment: order.comment||'—',
+        items: itemsText,
+        total: fmtPrice(total),
+        pv: fmtPV(totalPV)+' PV',
+      }
+    })
   }).catch(e=>{
     console.error('Email error:',e);
     // Заказ и телеграм-уведомление уже ушли, даже если email не отправился
