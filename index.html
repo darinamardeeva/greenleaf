@@ -382,6 +382,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="filter-item" id="f-hygiene" onclick="setCatFilter('hygiene',this)">
           <span>Женская гигиена</span>
         </div>
+        <div class="filter-item" id="f-health" onclick="setCatFilter('health',this)">
+          <span>Здоровье</span>
+        </div>
+        <div class="filter-item" id="f-access" onclick="setCatFilter('access',this)">
+          <span>Аксессуары</span>
+        </div>
+        <div class="filter-item" id="f-wipes" onclick="setCatFilter('wipes',this)">
+          <span>Бумажные и влажные салфетки</span>
+        </div>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-title">Наличие</div>
@@ -951,7 +960,7 @@ function productCardHTML(p){
 
 // ── HOME ──────────────────────────────────────────────────────
 function updateCatCounts(){
-  ['hair','body','hands','face','teeth','makeup','kids','laundry','clean','aroma','hygiene'].forEach(c=>{
+  ['hair','body','hands','face','teeth','makeup','kids','laundry','clean','aroma','hygiene','health','access','wipes'].forEach(c=>{
     const el=document.getElementById('fc-'+c);
     if(el) el.textContent=products.filter(p=>p.cat===c).length;
   });
